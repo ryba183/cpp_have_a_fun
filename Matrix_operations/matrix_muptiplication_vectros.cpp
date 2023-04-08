@@ -11,7 +11,7 @@
 #include <omp.h>
 
 
-
+//Function to print nicely the TicTacToe board
 template<class T>
 void printVector(std::vector<std::vector<T>> const &mat) {
     for (std::vector<T> row: mat)
@@ -23,7 +23,7 @@ void printVector(std::vector<std::vector<T>> const &mat) {
     }
     std::cout << '\n'<<std::endl;
 }
-
+//Function which returns product of 2 matrixes 
 template<class T>
 std::vector <std::vector<T>> multipMarix(std::vector<std::vector<T>> const &A, std::vector<std::vector<T>> const &B) {
     const int rows_a = A.size();
@@ -41,7 +41,7 @@ std::vector <std::vector<T>> multipMarix(std::vector<std::vector<T>> const &A, s
     }
     return C;
 }
-
+//Function which returns product of 2 matrixes with openMP
 template<class T>
 std::vector <std::vector<T>> multipMarixParallel(std::vector<std::vector<T>> const &A, std::vector<std::vector<T>> const &B) {
     const int rows_a = A.size();
@@ -59,7 +59,7 @@ std::vector <std::vector<T>> multipMarixParallel(std::vector<std::vector<T>> con
     }
     return C;
 }
-
+//Function to initialize a matrix(vector of vector) with random variables
 template<class T>
 std::vector <std::vector<T>> initMarix( int rows, int cols, int range) {
 
@@ -77,6 +77,7 @@ std::vector <std::vector<T>> initMarix( int rows, int cols, int range) {
 
 int main()
 {
+    //Calculate time needed to outperform matrix multiplication
     srand(time(NULL));
     auto start = std::chrono::high_resolution_clock::now();
     auto A = initMarix<int>(500,500,5);

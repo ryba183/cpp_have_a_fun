@@ -243,15 +243,15 @@ int UserMove(std::vector<T> &U_poss, std::vector<T> &A_num, int range){
 int main()
 {
     //Statistics
-    int number_of_games=10000;
+    int number_of_games=1000;
     int won_by_X=0;
     int won_by_O=0;
     int won_by_none=0;
     int start=0;
     
     //Board initialize parameters
-    int rows = 5;
-    int cols = 5;
+    int rows = 4;
+    int cols = 4;
     int user_move_X;
     int user_move_O;
     int range = rows * cols;
@@ -265,8 +265,9 @@ int main()
     Matrix = initBoard<std::string>(rows, cols);
     Allowed_numbers=initVec<int>(rows, cols);
     
-    while(start<number_of_games){
-        srand(time(NULL)+start);
+    // while(start<number_of_games)
+    for(int s=0;s<number_of_games;s++){
+        srand(time(NULL)+s);
 
 
         for(int k=0;k<rows*cols;k++){
@@ -280,7 +281,7 @@ int main()
             if(Game_won_X){
                 // std::cout<<"You ('X') won the game"<<'\n'<<"Game over"<<'\n';
                 won_by_X++;
-                start++;
+                // start++;
                 break;
             }
 
@@ -292,8 +293,8 @@ int main()
             }
             // printVector(Matrix);
             // std::cout<<range/2+1<<"mozliwe, X="<<counter_X<<", O="<<counter_O<<'\n';
-            if(counter_X>=range/2+1 || counter_O>=range/2+1){
-                start++;
+            if(counter_X>=static_cast<double>(range)/2){ // || counter_O>=range/2){
+                // start++;
                 won_by_none++;
                 // std::cout<<"Error"<<'\n'<<"Game over"<<'\n';
                 break;
@@ -309,13 +310,13 @@ int main()
             if(Game_won_O){
                 // std::cout<<"You ('O') won the game"<<'\n'<<"Game over"<<'\n';
                 won_by_O++;
-                start++;
+                // start++;
                 break;
             }
         }
         Matrix = initBoard<std::string>(rows, cols);
         Used_positions.erase(Used_positions.begin(), Used_positions.end());  
-        // std::cout<<static_cast<double>(start)/number_of_games*100<<"%"<<'\n';
+        std::cout<<static_cast<double>(s)/number_of_games*100<<"%"<<'\n';
     }
     std::cout<<" % won by 'X' = "<<static_cast<double>(won_by_X)/number_of_games*100<<"%"<<'\n';
     std::cout<<" % won by 'O' = "<<static_cast<double>(won_by_O)/number_of_games*100<<"%"<<'\n';
@@ -323,7 +324,3 @@ int main()
     
     return 0;
 }
-
-
-                // std::cout<<"You ('O') won the game"<<'\n'<<"Game over"<<'\n';
-                // printVector(Matrix);

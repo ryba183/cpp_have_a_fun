@@ -14,20 +14,6 @@ int size_b = 5;
 int size_c = 5;
 int size_d = 7; 
 
-
-void matrix_multiplicaiton(vector<vector<int>> &matrix_A, vector<vector<int>> &matrix_B) {
-    // matrix_A.size(); /* size of y */
-    // matrix_B[0].size(); /* size of x */
-    // for (int i = 0; i < rows; i++) {
-    //     for (int j = 0; j < cols; j++) {
-    //         cout << matrix[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
-    std::cout << matrix_A.size()<<' '<< matrix_B[0].size();
-}
-
-
 int main()
 {
     int A[size_a][size_b], B[size_c][size_d], C[size_a][size_d];
@@ -67,8 +53,6 @@ int main()
         }
         std::cout<<'|'<<'\n';
     }
-
-    matrix_multiplicaiton(A,B);
     
 
 }
