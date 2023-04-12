@@ -243,31 +243,37 @@ int UserMove(std::vector<T> &U_poss, std::vector<T> &A_num, int range){
 int main()
 {
     //Statistics
-    int number_of_games=1000;
-    int won_by_X=0;
-    int won_by_O=0;
-    int won_by_none=0;
+    int number_of_games=100000;
+    // int won_by_X=0;
+    // int won_by_O=0;
+    // int won_by_none=0;
     int start=0;
+    std::vector<int> won_by_X;
+    std::vector<int> won_by_O;
+    std::vector<int> won_by_none;
     
-    //Board initialize parameters
-    int rows = 4;
-    int cols = 4;
-    int user_move_X;
-    int user_move_O;
-    int range = rows * cols;
-    std::vector<int> Used_positions;
-    std::vector<int> Allowed_numbers;
-    std::vector<std::vector<std::string>> Matrix;
-    int X, Y;
-    bool Game_won_X, Game_won_O, Game_won_h, Game_won_v; 
-    
-    Used_positions.push_back(0);
-    Matrix = initBoard<std::string>(rows, cols);
-    Allowed_numbers=initVec<int>(rows, cols);
+
     
     // while(start<number_of_games)
+    #pragma omp parallel for
     for(int s=0;s<number_of_games;s++){
         srand(time(NULL)+s);
+
+        //Board initialize parameters
+        int rows = 4;
+        int cols = 4;
+        int user_move_X;
+        int user_move_O;
+        int range = rows * cols;
+        std::vector<int> Used_positions;
+        std::vector<int> Allowed_numbers;
+        std::vector<std::vector<std::string>> Matrix;
+        int X, Y;
+        bool Game_won_X, Game_won_O, Game_won_h, Game_won_v; 
+        
+        Used_positions.push_back(0);
+        Matrix = initBoard<std::string>(rows, cols);
+        Allowed_numbers=initVec<int>(rows, cols);
 
 
         for(int k=0;k<rows*cols;k++){
@@ -280,7 +286,7 @@ int main()
 
             if(Game_won_X){
                 // std::cout<<"You ('X') won the game"<<'\n'<<"Game over"<<'\n';
-                won_by_X++;
+                won_by_X.push_back(1);
                 // start++;
                 break;
             }
@@ -295,7 +301,7 @@ int main()
             // std::cout<<range/2+1<<"mozliwe, X="<<counter_X<<", O="<<counter_O<<'\n';
             if(counter_X>=static_cast<double>(range)/2){ // || counter_O>=range/2){
                 // start++;
-                won_by_none++;
+                won_by_none.push_back(1);
                 // std::cout<<"Error"<<'\n'<<"Game over"<<'\n';
                 break;
             }
@@ -309,7 +315,7 @@ int main()
 
             if(Game_won_O){
                 // std::cout<<"You ('O') won the game"<<'\n'<<"Game over"<<'\n';
-                won_by_O++;
+                won_by_O.push_back(1);
                 // start++;
                 break;
             }
@@ -318,9 +324,12 @@ int main()
         Used_positions.erase(Used_positions.begin(), Used_positions.end());  
         std::cout<<static_cast<double>(s)/number_of_games*100<<"%"<<'\n';
     }
-    std::cout<<" % won by 'X' = "<<static_cast<double>(won_by_X)/number_of_games*100<<"%"<<'\n';
-    std::cout<<" % won by 'O' = "<<static_cast<double>(won_by_O)/number_of_games*100<<"%"<<'\n';
-    std::cout<<" % won by none = "<<static_cast<double>(won_by_none)/number_of_games*100<<"%"<<'\n';
+    auto Won_by_X = std::reduce(won_by_X.begin(), won_by_X.end());
+    auto Won_by_O = std::reduce(won_by_O.begin(), won_by_O.end());
+    auto Won_by_none = std::reduce(won_by_none.begin(), won_by_none.end());
+    std::cout<<" % won by 'X' = "<<static_cast<double>(Won_by_X)/number_of_games*100<<"%"<<'\n';
+    std::cout<<" % won by 'O' = "<<static_cast<double>(Won_by_O)/number_of_games*100<<"%"<<'\n';
+    std::cout<<" % won by none = "<<static_cast<double>(Won_by_none)/number_of_games*100<<"%"<<'\n';
     
     return 0;
 }
