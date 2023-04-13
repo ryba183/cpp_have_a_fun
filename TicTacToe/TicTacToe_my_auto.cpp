@@ -102,6 +102,17 @@ std::vector<T> initVec(int rows, int cols) {
     return v;
 }
 
+//Function to initialize a vector with given value 
+template<class T>
+std::vector<T> initVec_value(int rows, int value) {
+
+    std::vector<int> v;
+        for(int i=0;i<rows;i++){
+            v.push_back(value); 
+        }
+    return v;
+}
+
 //Function to find cell in the board
 std::tuple<int, int> find_matrix_position(int position, int n) {
     int pos_x = (position-1)/n;
@@ -251,9 +262,11 @@ int main()
     std::vector<int> won_by_X;
     std::vector<int> won_by_O;
     std::vector<int> won_by_none;
+    std::vector<int> won_by;
+    won_by = initVec_value<int>(number_of_games, 0);
     
 
-    
+        
     // while(start<number_of_games)
     #pragma omp parallel for
     for(int s=0;s<number_of_games;s++){
@@ -286,7 +299,7 @@ int main()
 
             if(Game_won_X){
                 // std::cout<<"You ('X') won the game"<<'\n'<<"Game over"<<'\n';
-                won_by_X.push_back(1);
+                won_by[s] = 1;
                 // start++;
                 break;
             }
@@ -301,7 +314,7 @@ int main()
             // std::cout<<range/2+1<<"mozliwe, X="<<counter_X<<", O="<<counter_O<<'\n';
             if(counter_X>=static_cast<double>(range)/2){ // || counter_O>=range/2){
                 // start++;
-                won_by_none.push_back(1);
+                won_by[s] = 0;
                 // std::cout<<"Error"<<'\n'<<"Game over"<<'\n';
                 break;
             }
@@ -315,7 +328,7 @@ int main()
 
             if(Game_won_O){
                 // std::cout<<"You ('O') won the game"<<'\n'<<"Game over"<<'\n';
-                won_by_O.push_back(1);
+                won_by[s] = 2;
                 // start++;
                 break;
             }
@@ -324,12 +337,13 @@ int main()
         Used_positions.erase(Used_positions.begin(), Used_positions.end());  
         std::cout<<static_cast<double>(s)/number_of_games*100<<"%"<<'\n';
     }
-    auto Won_by_X = std::reduce(won_by_X.begin(), won_by_X.end());
-    auto Won_by_O = std::reduce(won_by_O.begin(), won_by_O.end());
-    auto Won_by_none = std::reduce(won_by_none.begin(), won_by_none.end());
+    auto Won_by_X = std::count(won_by.begin(), won_by.end(), 1);
+    auto Won_by_O = std::count(won_by.begin(), won_by.end(), 2);
+    auto Won_by_none = std::count(won_by.begin(), won_by.end(), 0);
     std::cout<<" % won by 'X' = "<<static_cast<double>(Won_by_X)/number_of_games*100<<"%"<<'\n';
     std::cout<<" % won by 'O' = "<<static_cast<double>(Won_by_O)/number_of_games*100<<"%"<<'\n';
     std::cout<<" % won by none = "<<static_cast<double>(Won_by_none)/number_of_games*100<<"%"<<'\n';
+    
     
     return 0;
 }
