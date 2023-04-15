@@ -251,22 +251,27 @@ int UserMove(std::vector<T> &U_poss, std::vector<T> &A_num, int range){
     return user_move;
 }
 
+//Function which perform the 'move' of each player
+template<class T>
+std::tuple<int, std::vector<T>> UserMove_2(std::vector<T> &A_num){
+    int user_move_index, user_move;
+    const int vec_length = A_num.size();
+    user_move_index = rand() % vec_length;
+    user_move = A_num[user_move_index];
+    A_num.erase(A_num.begin()+user_move_index);
+
+    return std::make_tuple(user_move, A_num);
+
+}
+
 int main()
 {
     //Statistics
-    int number_of_games=100000;
-    // int won_by_X=0;
-    // int won_by_O=0;
-    // int won_by_none=0;
+    int number_of_games=1000000;
     int start=0;
-    std::vector<int> won_by_X;
-    std::vector<int> won_by_O;
-    std::vector<int> won_by_none;
     std::vector<int> won_by;
     won_by = initVec_value<int>(number_of_games, 0);
     
-
-        
     // while(start<number_of_games)
     #pragma omp parallel for
     for(int s=0;s<number_of_games;s++){
@@ -278,64 +283,47 @@ int main()
         int user_move_X;
         int user_move_O;
         int range = rows * cols;
-        std::vector<int> Used_positions;
         std::vector<int> Allowed_numbers;
         std::vector<std::vector<std::string>> Matrix;
         int X, Y;
         bool Game_won_X, Game_won_O, Game_won_h, Game_won_v; 
         
-        Used_positions.push_back(0);
         Matrix = initBoard<std::string>(rows, cols);
         Allowed_numbers=initVec<int>(rows, cols);
 
 
         for(int k=0;k<rows*cols;k++){
-            user_move_X = UserMove(Used_positions, Allowed_numbers, range);
-            // std::cout<<user_move_X<<"X"<<'\n';
+            std::tie(user_move_X, Allowed_numbers) = UserMove_2(Allowed_numbers);
             std::tie(X,Y) = find_matrix_position(user_move_X,rows);
             Matrix[X][Y] = "X";
             Game_won_X = Check_winning_game(Matrix, "X");
-            Used_positions.push_back(user_move_X);
 
             if(Game_won_X){
-                // std::cout<<"You ('X') won the game"<<'\n'<<"Game over"<<'\n';
                 won_by[s] = 1;
-                // start++;
                 break;
             }
-
-            int counter_X = 0;
-            int counter_O = 0;
-            for (const auto& inner : Matrix) {
-                counter_X += std::count(inner.begin(), inner.end(), "X");
-                counter_O += std::count(inner.begin(), inner.end(), "O");
-            }
-            // printVector(Matrix);
-            // std::cout<<range/2+1<<"mozliwe, X="<<counter_X<<", O="<<counter_O<<'\n';
-            if(counter_X>=static_cast<double>(range)/2){ // || counter_O>=range/2){
-                // start++;
+            if(Allowed_numbers.size() == 0){ 
                 won_by[s] = 0;
-                // std::cout<<"Error"<<'\n'<<"Game over"<<'\n';
                 break;
             }
             
-            user_move_O = UserMove(Used_positions, Allowed_numbers, range);
-            // std::cout<<user_move_O<<"Zero"<<'\n';
+            std::tie(user_move_O, Allowed_numbers) = UserMove_2(Allowed_numbers);
             std::tie(X,Y) = find_matrix_position(user_move_O,rows);
             Matrix[X][Y] = "O";
             Game_won_O = Check_winning_game(Matrix, "O");
-            Used_positions.push_back(user_move_O);
 
             if(Game_won_O){
-                // std::cout<<"You ('O') won the game"<<'\n'<<"Game over"<<'\n';
                 won_by[s] = 2;
-                // start++;
+                break;
+            }
+
+            if(Allowed_numbers.size() == 0){ 
+                won_by[s] = 0;
                 break;
             }
         }
         Matrix = initBoard<std::string>(rows, cols);
-        Used_positions.erase(Used_positions.begin(), Used_positions.end());  
-        std::cout<<static_cast<double>(s)/number_of_games*100<<"%"<<'\n';
+        // std::cout<<static_cast<double>(s)/number_of_games*100<<"%"<<'\n';
     }
     auto Won_by_X = std::count(won_by.begin(), won_by.end(), 1);
     auto Won_by_O = std::count(won_by.begin(), won_by.end(), 2);
